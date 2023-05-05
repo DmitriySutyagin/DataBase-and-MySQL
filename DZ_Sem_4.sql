@@ -210,14 +210,14 @@ INSERT INTO `profiles` (user_id, gender, birthday, photo_id, hometown) VALUES
 (9, 'f', '1982-11-01', 9, 'Loweborough'),
 (10, 'm', '1977-05-14', NULL, 'New Nellaside'); 
 
+
+
 -- Задача 1.Подсчитать общее количество лайков, которые получили пользователи младше 12 лет.
 
-
-
 SELECT 
-      count(l.id) AS 'Общее количество лайков, которые получили пользователи младше 12 лет.'
+      sum(m.user_id) AS 'Общее количество лайков, которые получили пользователи младше 12 лет.'
 FROM users u 
-RIGHT JOIN likes l ON u.id = l.user_id  
+RIGHT JOIN media m  ON u.id = m.user_id  
 JOIN profiles p ON u.id = p.user_id 
 WHERE p.birthday  > '2010-01-01';
 
@@ -228,11 +228,11 @@ WHERE p.birthday  > '2010-01-01';
 
 
 SELECT
-     COUNT(p.gender) AS 'Количество лайков поставленых мужчинами и женщинами',
+     sum(l.user_id) AS 'Количество лайков поставленых мужчинами и женщинами',
      p.gender 
-FROM media m 
-RIGHT JOIN profiles p ON m.user_id  = p.user_id 
-GROUP BY p.gender ;
+FROM profiles p
+RIGHT JOIN likes l  ON l.user_id  = p.user_id 
+GROUP BY p.gender;
 
 
 -- Задача 3.Вывести всех пользователей, которые не отправляли сообщения.
