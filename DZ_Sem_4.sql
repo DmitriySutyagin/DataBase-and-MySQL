@@ -214,21 +214,19 @@ INSERT INTO `profiles` (user_id, gender, birthday, photo_id, hometown) VALUES
 
 -- Задача 1.Подсчитать общее количество лайков, которые получили пользователи младше 12 лет.
 
-SELECT 
-      sum(m.user_id) AS 'Общее количество лайков, которые получили пользователи младше 12 лет.'
-FROM users u 
-RIGHT JOIN media m  ON u.id = m.user_id  
-JOIN profiles p ON u.id = p.user_id 
+SELECT
+      COUNT(m.id) AS 'Общее количество лайков, которые получили пользователи младше 12 лет.'
+FROM likes l 
+JOIN media m ON l.media_id = m.id 
+JOIN profiles p  ON p.user_id = m.user_id 
 WHERE p.birthday  > '2010-01-01';
-
-
 
 
 -- Задача 2. Определить кто больше поставил лайков (всего): мужчины или женщины.
 
 
 SELECT
-     sum(l.user_id) AS 'Количество лайков поставленых мужчинами и женщинами',
+     count(l.user_id) AS 'Количество лайков поставленых мужчинами и женщинами',
      p.gender 
 FROM profiles p
 RIGHT JOIN likes l  ON l.user_id  = p.user_id 
