@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS lesson_4;
-CREATE DATABASE lesson_4;
-USE lesson_4;
+DROP DATABASE IF EXISTS dz_sem_5;
+CREATE DATABASE dz_sem_5;
+USE dz_sem_5;
 
 -- пользователи
 DROP TABLE IF EXISTS users;
@@ -212,36 +212,85 @@ INSERT INTO `profiles` (user_id, gender, birthday, photo_id, hometown) VALUES
 
 
 
--- Задача 1.Подсчитать общее количество лайков, которые получили пользователи младше 12 лет.
-
-SELECT 
-       COUNT(m.id) AS 'Общее количество лайков, которые получили пользователи младше 12 лет.'
-FROM likes l 
-JOIN media m ON l.media_id = m.id 
-JOIN profiles p  ON p.user_id = m.user_id 
-WHERE p.birthday  > '2010-01-01'
 
 
--- Задача 2. Определить кто больше поставил лайков (всего): мужчины или женщины.
 
+
+-- Зададача 1.
+--  Создайте представление, в которое попадет информация о пользователях (имя, фамилия, город и пол), которые не старше 20 лет.
+
+
+CREATE OR REPLACE VIEW viborka AS 
+SELECT
+	u.firstname,
+	u.lastname,
+	p.hometown ,
+	p.gender
+FROM
+	dz_sem_5.users u
+JOIN dz_sem_5.profiles p ON
+	u.id = p.user_id
+WHERE
+	TIMESTAMPDIFF(YEAR,
+	p.birthday ,
+	NOW()) < 20; 
+
+SELECT firstname,lastname, hometown ,gender  FROM viborka; 
+
+
+-- Задача 2.Найдите кол-во, отправленных сообщений каждым пользователем и выведите ранжированный список пользователь, 
+-- указав указать имя и фамилию пользователя, количество отправленных сообщений и место в рейтинге (первое место у пользователя с максимальным количеством сообщений) . 
+-- (используйте DENSE_RANK)
 
 SELECT
-     count(l.user_id) AS 'Количество лайков поставленых мужчинами и женщинами',
-     p.gender 
-FROM profiles p
-RIGHT JOIN likes l  ON l.user_id  = p.user_id 
-GROUP BY p.gender;
+	u.id ,
+	CONCAT(firstname, ' ', lastname) AS 'Пользователи',
+	count(m.id) AS 'Количество сообщений',
+	DENSE_RANK() OVER(
+	ORDER BY count(m.id) DESC) AS 'Рейтинг пользователей'
+FROM messages m
+RIGHT JOIN users u  ON
+	m.from_user_id  = u.id
+GROUP BY 
+	u.id ; 
 
 
--- Задача 3.Вывести всех пользователей, которые не отправляли сообщения.
- 
 
-SELECT 
-      u.*,
-      m.from_user_id
-FROM messages m 
-RIGHT JOIN users u ON u.id = m.from_user_id
-WHERE m.id IS NULL;
+
+
+-- Задача 3. Выберите все сообщения, отсортируйте сообщения по возрастанию даты отправления (created_at) и найдите разницу дат отправления между соседними сообщениями, 
+-- получившегося списка.
+-- (используйте LEAD или LAG)
+
+SELECT
+m.id,
+m.body ,
+m.created_at ,
+LEAD (m.created_at,1,0) OVER(ORDER BY created_at) AS last_messege,
+timediff(m.created_at,LEAD (m.created_at,1,0) OVER(ORDER BY created_at)) AS  'Разница отпрвлений между соседними сообщениями в минутах'
+FROM messages m;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
